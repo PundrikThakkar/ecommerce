@@ -27,6 +27,9 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
+    refreshToken: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
@@ -43,22 +46,14 @@ userSchema.methods.isPasswordCorrect = async (password) => {
 };
 
 userSchema.methods.generateAccessToken = () => {
-  return jwt.sign(
-    { _id: this._id, email: this.email, username: this.username },
-    process.env.ACCESS_TOKEN_SECRET,
-    {
-      expiresIn: process.env.ACCESS_TOKEN_EXPIREY,
-    }
-  );
+  return jwt.sign({ _id: this._id }, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: process.env.ACCESS_TOKEN_EXPIREY,
+  });
 };
 
 userSchema.methods.generateRefreshToken = () => {
-  return jwt.sign(
-    { _id: this._id, password: this.password },
-    process.env.REFRESH_TOKEN_SECRET,
-    {
-      expiresIn: REFRESH_TOKEN_EXPIRY,
-    }
-  );
+  return jwt.sign({ _id: this._id }, process.env.REFRESH_TOKEN_SECRET, {
+    expiresIn: REFRESH_TOKEN_EXPIRY,
+  });
 };
 export const User = mongoose.model("User", userSchema);
